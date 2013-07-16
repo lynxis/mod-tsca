@@ -1,0 +1,24 @@
+{
+  "name": "tsca",
+  "types": ["module"],
+  "version": "1.4",
+  "homepage": "http://github.com/shinken-monitoring/mod-tsca",
+  "author": "Jean Gabès",
+  "description": "Export data to a Thrift server",
+  "contributors": [
+    {
+      "name": "Jean Gabès",
+      "email": "naparuba@gmail.com"
+    }
+  ],
+  "repository": "https://github.com/shinken-monitoring/mod-tsca",
+  "keywords": [
+    "module",
+    "broker",
+    "tsca"
+  ],
+  "dependencies": {
+    "shinken": ">=1.4"
+  },
+  "license": "AGPL"
+}
