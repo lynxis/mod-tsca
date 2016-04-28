@@ -36,6 +36,7 @@ try:
     from org.shinken_monitoring.tsca import StateService
     from org.shinken_monitoring.tsca.ttypes import *
     from thrift.transport import TSocket
+    from thrift.transport import TSSLSocket
     from thrift.transport import TTransport
     from thrift.protocol import TBinaryProtocol
     from thrift.server import TServer
@@ -77,7 +78,12 @@ def get_instance(plugin):
     else:
         max_packet_age = 30
 
-    instance = TSCA_arbiter(plugin, host, port, max_packet_age)
+    if hasattr(plugin, 'certfile'):
+        certfile = plugin.certfile
+    else:
+        certfile = None
+
+    instance = TSCA_arbiter(plugin, host, port, max_packet_age, certfile=certfile)
     return instance
 
 
@@ -120,11 +126,12 @@ class StateServiceHandler:
 
 # Just print some stuff
 class TSCA_arbiter(BaseModule):
-    def __init__(self, modconf, host, port, max_packet_age):
+    def __init__(self, modconf, host, port, max_packet_age, certfile=None):
         BaseModule.__init__(self, modconf)
         self.host = host
         self.port = port
         self.max_packet_age = max_packet_age
+        self.certfile = certfile
 
     # Ok, main function that is called in the CONFIGURATION phase
     def get_objects(self):
@@ -182,7 +189,10 @@ class TSCA_arbiter(BaseModule):
         try:
             handler = StateServiceHandler(self)
             processor = StateService.Processor(handler)
-            transport = TSocket.TServerSocket(self.host, self.port)
+            if self.certfile:
+                transport = TSSLSocket.TSSLServerSocket(self.host, self.port, certfile=self.certfile)
+            else:
+                transport = TSocket.TServerSocket(self.host, self.port)
             tfactory = TTransport.TBufferedTransportFactory()
             pfactory = TBinaryProtocol.TBinaryProtocolFactory()
             # In order to accept multiple simultaneous clients, we use TThreadedServer
