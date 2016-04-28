@@ -198,5 +198,5 @@ class TSCA_arbiter(BaseModule):
             # In order to accept multiple simultaneous clients, we use TThreadedServer
             server = TServer.TThreadedServer(processor, transport, tfactory, pfactory)
             server.serve()
-        except:
-            logger.error("Error while trying to launch TSCA module")
+        except Exception as exp:
+            logger.error("Error while trying to launch TSCA module %s", exp)
